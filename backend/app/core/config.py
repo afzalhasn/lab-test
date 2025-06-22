@@ -32,9 +32,14 @@ class Settings(BaseSettings):
 
     # JWT settings
     SECRET_KEY: str
-    ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int= 3600
-
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    
+    # Cookie settings
+    COOKIE_DOMAIN: str = "localhost"
+    COOKIE_SECURE: bool = False  # Set to True in production with HTTPS
+    COOKIE_SAMESITE: str = "lax"
 
     # Compose the full DATABASE URL
     @property

@@ -17,14 +17,8 @@ SessionLocal = async_sessionmaker(
 
 
 # For FastAPI Dependency
+# @asynccontextmanager
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionLocal() as session:
-        yield session
-
-
-# For background tasks / CLI scripts
-@asynccontextmanager
-async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as session:
         try:
             yield session
@@ -33,6 +27,8 @@ async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
             await session.rollback()
             logger.error(f"Database error: {str(e)}")
             raise
+        finally:
+            await session.close()
 
 
 # SessionLocalSync = sessionmaker(

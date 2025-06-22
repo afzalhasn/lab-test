@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Enum, DateTime
+from sqlalchemy import Column, String, Enum, DateTime, Text, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from app.db.base import Base
 from app.core.config import settings
@@ -16,10 +16,13 @@ class User(Base):
     __tablename__ = "users"
     __table_args__ = {"schema": settings.DB_SCHEMA}
 
-
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    username = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    full_name = Column(String(100), nullable=False)
     role = Column(Enum(UserRole), nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
+    is_active = Column(Boolean, default=True, nullable=False)
+    refresh_token = Column(Text, nullable=True)
+    refresh_token_expires_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)

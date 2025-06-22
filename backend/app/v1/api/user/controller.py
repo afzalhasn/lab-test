@@ -1,10 +1,19 @@
-from fastapi import HTTPException
-from .crud import UserCRUD
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List, Optional
+from uuid import UUID
+from fastapi import HTTPException, status
+
+from app.models.user import User, UserRole
+from .crud import UserCRUD, get_user_crud
+from .schema import UserCreate, UserUpdate, UserLogin, PasswordChange
+from app.core.auth import create_access_token, create_refresh_token
 
 class UserController:
-
-    def __init__(self, db: Session):
+    """Business logic layer for user operations"""
+    
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self.user_crud = get_user_crud(db)
         self.crud = UserCRUD(db)
 
     async def create_user(self, user_in):
@@ -23,4 +32,8 @@ class UserController:
 
         access_token = self.crud.create_access_token(data={"sub": str(user.id), "username": user.username, "role": user.role})
         return {"access_token": access_token, "token_type": "bearer"}
+
+def get_user_controller(db: AsyncSession) -> UserController:
+    """Get UserController instance"""
+    return UserController(db)
 
